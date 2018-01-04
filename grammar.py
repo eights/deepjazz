@@ -9,9 +9,10 @@ https://github.com/evancchow/jazzml,with permission.
 
 from collections import OrderedDict, defaultdict
 from itertools import groupby
+
 from music21 import *
 import copy, random, pdb
-
+environment.UserSettings()['warnings'] = 0
 ''' Helper function to determine if a note is a scale tone. '''
 def __is_scale_tone(chord, note):
     # Method: generate all scales that have the chord notes th check if note is
@@ -128,6 +129,8 @@ def parse_melody(fullMeasureNotes, fullMeasureChords):
     chords = copy.deepcopy(fullMeasureChords)
     measure.removeByNotOfClass([note.Note, note.Rest])
     chords.removeByNotOfClass([chord.Chord])
+
+
 
     # Information for the start of the measure.
     # 1) measureStartTime: the offset for measure's start, e.g. 476.0.

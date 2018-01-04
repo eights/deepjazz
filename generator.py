@@ -16,6 +16,8 @@ GPU run command:
     Note: running Keras/Theano on GPU is formally supported for only NVIDIA cards (CUDA backend).
 '''
 from __future__ import print_function
+
+import argparse
 import sys
 
 from music21 import *
@@ -94,35 +96,36 @@ def __generate_grammar(model, corpus, abstract_grammars, values, val_indices,
 #----------------------------PUBLIC FUNCTIONS----------------------------------#
 ''' Generates musical sequence based on the given data filename and settings.
     Plays then stores (MIDI file) the generated output. '''
-def generate(data_fn, out_fn, N_epochs):
+def generate(data_fn, out_fn, n_epochs, args):
+
     # model settings
     max_len = 20
     max_tries = 1000
     diversity = 0.5
 
     # musical settings
-    bpm = 130
+    bpm = 100
 
     # get data
-    chords, abstract_grammars = get_musical_data(data_fn)
+    chords, abstract_grammars = get_musical_data(data_fn, args)
     corpus, values, val_indices, indices_val = get_corpus_data(abstract_grammars)
     print('corpus length:', len(corpus))
     print('total # of values:', len(values))
 
     # build model
-    model = lstm.build_model(corpus=corpus, val_indices=val_indices, 
-                             max_len=max_len, N_epochs=N_epochs)
+    model = lstm.build_model(corpus=corpus, val_indices=val_indices,
+                             max_len=max_len, n_epochs=n_epochs)
 
     # set up audio stream
     out_stream = stream.Stream()
 
     # generation loop
     curr_offset = 0.0
-    loopEnd = len(chords)
-    for loopIndex in range(1, loopEnd):
+    loop_end = len(chords)
+    for loop_index in range(1, loop_end):
         # get chords from file
         curr_chords = stream.Voice()
-        for j in chords[loopIndex]:
+        for j in chords[loop_index]:
             curr_chords.insert((j.offset % 4), j)
 
         # generate grammar
@@ -174,20 +177,40 @@ def generate(data_fn, out_fn, N_epochs):
 ''' Runs generate() -- generating, playing, then storing a musical sequence --
     with the default Metheny file. '''
 def main(args):
-    try:
-        N_epochs = int(args[1])
-    except:
-        N_epochs = 128 # default
+    n_epochs = args.n
 
     # i/o settings
-    data_fn = 'midi/' + 'original_metheny.mid' # 'And Then I Knew' by Pat Metheny 
-    out_fn = 'midi/' 'deepjazz_on_metheny...' + str(N_epochs)
-    if (N_epochs == 1): out_fn += '_epoch.midi'
+    midi_in = args.midi # Default is 'And Then I Knew' by Pat Metheny
+    midi_out = 'dj_' + midi_in[:-4]
+
+    data_fn = 'midi/' + midi_in
+    out_fn = 'midi/' + midi_out + "_{}-{}_s{}_".format(args.start, args.end, args.splice) + str(n_epochs)
+    if (n_epochs == 1): out_fn += '_epoch.midi'
     else:               out_fn += '_epochs.midi'
 
-    generate(data_fn, out_fn, N_epochs)
+    generate(data_fn, out_fn, n_epochs, args)
+
+p = argparse.ArgumentParser()
+
+p.add_argument('--n', help="Number of epochs", type=int, default=128)
+p.add_argument('--midi', help="MIDI file to input", default="original_metheny.mid")
+p.add_argument('--start', help="Start offset", type=float, default=478)
+p.add_argument('--end', help="End offset", type=float, default=548)
+p.add_argument('--bpm', type=int, default=130)
+p.add_argument('--splice', type=int, default=4)
+# Track numbers
+p.add_argument('--melody_t', help="Track # (indexed at 0) of the melody in MIDI file", type=int, default=5)
+p.add_argument('--accomp_t', help="Accompaniment tracks i.e. 1,2,3,4,5", default="0,1,6,7")
+p.add_argument('--chord_t', help="Chord track", type=int, default=0)
+
+# Model settings
+p.add_argument('--max_len', type=int, default=20)
+p.add_argument('--max_tries', type=int, default=1000)
+p.add_argument('--max_diversity', type=int, default=0.5)
+
+
 
 ''' If run as script, execute main '''
 if __name__ == '__main__':
-    import sys
-    main(sys.argv)
+    args = p.parse_args()
+    main(args)

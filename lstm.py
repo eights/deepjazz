@@ -16,7 +16,7 @@ from keras.layers.recurrent import LSTM
 import numpy as np
 
 ''' Build a 2-layer LSTM from a training corpus '''
-def build_model(corpus, val_indices, max_len, N_epochs=128):
+def build_model(corpus, val_indices, max_len, n_epochs=128):
     # number of different values or words in corpus
     N_values = len(set(corpus))
 
@@ -48,6 +48,6 @@ def build_model(corpus, val_indices, max_len, N_epochs=128):
 
     model.compile(loss='categorical_crossentropy', optimizer='rmsprop')
 
-    model.fit(X, y, batch_size=128, nb_epoch=N_epochs)
+    model.fit(X, y, batch_size=128, nb_epoch=n_epochs)
 
     return model
