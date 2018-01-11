@@ -45,20 +45,20 @@ optional arguments:
 
 Run on GPU with command:
 ```
-THEANO_FLAGS=mode=FAST_RUN,device=gpu,floatX=float32 python generator.py [# of epochs]
+THEANO_FLAGS=mode=FAST_RUN,device=gpu,floatX=float32 python generator.py [arguments]
 ```
-Note: I haven't tested the parameters on GPU
+Note: I haven't tested the arguments on GPU
 
 Note: running Keras/Theano on GPU is formally supported for only NVIDIA cards (CUDA backend).
 
 Note: `preprocess.py` must be modified to work with other MIDI files (the relevant "melody" MIDI part needs to be selected). The ability to handle this natively is a planned feature.
 
 ### Known Issues
-*ValueError: sum(pvals[:-1]) > 1.0
-    *I'll have to look into this more; it seems like it can be temporarily solved by using a larger sample or a smaller number of epochs
-*It needs a non-rest note to be played at least every measure in both the chord and melody, or else there will be an uneven number of melody and chord measures
-    *Temporary fix is selecting offsets that don't have long breaks between notes or setting splice to a higher number
-*After using more complex riffs for training, it plays notes that don't belong in a chord
+* ValueError: sum(pvals[:-1]) > 1.0
+    * I'll have to look into this more; it seems like it can be temporarily solved by using a larger sample or a smaller number of epochs
+* It needs a non-rest note to be played at least every measure in both the chord and melody, or else there will be an uneven number of melody and chord measures
+    * Temporary fix is selecting offsets that don't have long breaks between notes or setting splice to a higher number
+* After using more complex riffs for training, it plays notes that don't belong in a chord
 
 ### Citations
 
