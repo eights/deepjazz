@@ -1,4 +1,3 @@
-Note: deepjazz has been succeeded by [**songbird.ai**](http://songbird.ai) and is no longer being actively developed. 
 
 ***
 
@@ -6,10 +5,9 @@ Note: deepjazz has been succeeded by [**songbird.ai**](http://songbird.ai) and i
 
 ### Using Keras & Theano for deep learning driven jazz generation
 
-I built [*deepjazz*](https://deepjazz.io) in 36 hours at a hackathon. It uses Keras & Theano, two deep learning libraries, to generate jazz music. Specifically, it builds a two-layer [LSTM](http://deeplearning.net/tutorial/lstm.html), learning from the given MIDI file. It uses deep learning, the AI tech that powers [Google's AlphaGo](https://deepmind.com/alpha-go.html) and [IBM's Watson](https://www.ibm.com/smarterplanet/us/en/ibmwatson/what-is-watson.html), **to make music -- something that's considered as deeply human**.
+This is the beginning of a project built off of Ji-Sung Kim's deepjazz (https://github.com/jisungk/deepjazz), used with prior permission
 
-[![SoundCloud](https://jisungk.github.io/deepjazz/img/button_soundcloud.png)](https://soundcloud.com/deepjazz-ai)  
-Check out deepjazz's music on **[SoundCloud](https://soundcloud.com/deepjazz-ai)**!
+ It uses Keras & Theano, two deep learning libraries, to generate jazz music. Specifically, it builds a two-layer LSTM, learning from the given MIDI file.
 
 ### Dependencies
 
@@ -19,25 +17,48 @@ Check out deepjazz's music on **[SoundCloud](https://soundcloud.com/deepjazz-ai)
 
 ### Instructions
 
-Run on CPU with command:  
+Run on CPU with command:
 ```
-python generator.py [# of epochs]
+usage: python generator.py [-h] [--n N] [--midi MIDI] [--start START] [--end END]
+                    [--bpm BPM] [--splice SPLICE] [--melody_t MELODY_T]
+                    [--accomp_t ACCOMP_T] [--chord_t CHORD_T]
+                    [--max_len MAX_LEN] [--max_tries MAX_TRIES]
+                    [--max_diversity MAX_DIVERSITY]
+
+Note: all arguments default to what was used for deepjazz on Metheny's "And Then I Knew"
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --n N                 Number of epochs
+  --midi MIDI           MIDI file to input
+  --start START         Start offset (equal to measure number * beat number)
+  --end END             End offset (equal to measure number * beat number)
+  --bpm BPM
+  --splice SPLICE
+  --melody_t MELODY_T   Track # (indexed at 0) of the melody in MIDI file
+  --accomp_t ACCOMP_T   Accompaniment tracks to use i.e. '1,2,3,4,5'
+  --chord_t CHORD_T     Chord track # to use
+  --max_len MAX_LEN
+  --max_tries MAX_TRIES
+  --max_diversity MAX_DIVERSITY
 ```
 
-Run on GPU with command:  
+Run on GPU with command:
 ```
 THEANO_FLAGS=mode=FAST_RUN,device=gpu,floatX=float32 python generator.py [# of epochs]
 ```
+Note: I haven't tested the parameters on GPU
 
 Note: running Keras/Theano on GPU is formally supported for only NVIDIA cards (CUDA backend).
 
 Note: `preprocess.py` must be modified to work with other MIDI files (the relevant "melody" MIDI part needs to be selected). The ability to handle this natively is a planned feature.
 
-### Author
-
-[Ji-Sung Kim](https://jisungkim.com)  
-Princeton University, Department of Computer Science  
-hello (at) jisungkim.com  
+### Known Issues
+*ValueError: sum(pvals[:-1]) > 1.0
+    *I'll have to look into this more; it seems like it can be temporarily solved by using a larger sample or a smaller number of epochs
+*It needs a non-rest note to be played at least every measure in both the chord and melody, or else there will be an uneven number of melody and chord measures
+    *Temporary fix is selecting offsets that don't have long breaks between notes or setting splice to a higher number
+*After using more complex riffs for training, it plays notes that don't belong in a chord
 
 ### Citations
 
