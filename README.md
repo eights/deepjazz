@@ -47,7 +47,6 @@ Run on GPU with command:
 ```
 THEANO_FLAGS=mode=FAST_RUN,device=gpu,floatX=float32 python generator.py [arguments]
 ```
-Note: I haven't tested the arguments on GPU
 
 Note: running Keras/Theano on GPU is formally supported for only NVIDIA cards (CUDA backend).
 
